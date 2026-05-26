@@ -292,44 +292,44 @@ if st.button("Ejecutar modelo"):
     st.write(beta_opt)
 
     # ---------------------------------
-# PROYECCIÓN DESDE EL ÚLTIMO CENSO
-# ---------------------------------
-
-i0 = T_hist
-
-P0 = [
-    POB[r][i0]
-    for r in regiones
-]
-
-sol_final = solve_ivp(
-    sistema,
-    [i0, T_f],
-    P0,
-    args=(beta_opt,),
-    t_eval=np.linspace(i0, T_f, 300)
-)
-
-# ---------------------------------
-# TABLA
-# ---------------------------------
-
-tabla = []
-
-for j, r in enumerate(regiones):
-
-    fila = {
-        "region": r,
-        "prediccion": sol_final.y[j][-1]
-    }
-
-    tabla.append(fila)
-
-df = pd.DataFrame(tabla)
-
-st.subheader("Predicción del próximo censo")
-
-st.dataframe(df)
+    # PROYECCIÓN DESDE EL ÚLTIMO CENSO
+    # ---------------------------------
+    
+    i0 = T_hist
+    
+    P0 = [
+        POB[r][i0]
+        for r in regiones
+    ]
+    
+    sol_final = solve_ivp(
+        sistema,
+        [i0, T_f],
+        P0,
+        args=(beta_opt,),
+        t_eval=np.linspace(i0, T_f, 300)
+    )
+    
+    # ---------------------------------
+    # TABLA
+    # ---------------------------------
+    
+    tabla = []
+    
+    for j, r in enumerate(regiones):
+    
+        fila = {
+            "region": r,
+            "prediccion": sol_final.y[j][-1]
+        }
+    
+        tabla.append(fila)
+    
+    df = pd.DataFrame(tabla)
+    
+    st.subheader("Predicción del próximo censo")
+    
+    st.dataframe(df)
 
     # ---------------------------------
     # GRÁFICO
