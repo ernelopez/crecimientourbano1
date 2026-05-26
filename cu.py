@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -369,4 +368,3 @@ if st.button("Ejecutar modelo"):
     ax.legend()
 
     st.pyplot(fig)
-```
