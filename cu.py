@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -15,18 +16,55 @@ st.title("Modelo poblacional con vecindades")
 n_regiones = st.number_input(
     "Cantidad de regiones",
     min_value=1,
-    value=3,
-    step=1
-)
-
-n_censos = st.number_input(
-    "Cantidad de censos históricos",
-    min_value=2,
-    value=4,
+    value=6,
     step=1
 )
 
 regiones = [f"R{i+1}" for i in range(n_regiones)]
+
+# ---------------------------------
+# VALORES INICIALES
+# ---------------------------------
+
+POB_default = {
+    "R1": [50, 70, 95, 125],
+    "R2": [50, 68, 92, 120],
+    "R3": [50, 60, 72, 88],
+    "R4": [50, 58, 75, 100],
+    "R5": [50, 55, 85, 110],
+    "R6": [50, 52, 60, 72]
+}
+
+INF_default = {
+    "R1": [1, 1, 1, 1],
+    "R2": [1, 1, 1, 1],
+    "R3": [0.5, 0.5, 0.5, 0.5],
+    "R4": [0, 0, 0.5, 0.5],
+    "R5": [0, 0, 0, 0],
+    "R6": [0, 0, 0, 0]
+}
+
+INF_ACT_default = {
+    "R1": 1,
+    "R2": 1,
+    "R3": 0.5,
+    "R4": 1,
+    "R5": 0,
+    "R6": 0
+}
+
+Vecinos_default = {
+    "R1": ["R2"],
+    "R2": ["R1", "R3"],
+    "R3": ["R2", "R4"],
+    "R4": ["R3", "R5"],
+    "R5": ["R4", "R6"],
+    "R6": ["R5"]
+}
+
+# ---------------------------------
+# CARGA DE DATOS
+# ---------------------------------
 
 st.header("Datos")
 
@@ -35,35 +73,45 @@ INF = {}
 INF_ACT = {}
 Vecinos = {}
 
-# ---------------------------------
-# CARGA DE DATOS
-# ---------------------------------
-
 for r in regiones:
 
     st.subheader(r)
 
+    pob_default = ",".join(
+        map(str, POB_default.get(r, [50,60,70,80]))
+    )
+
+    inf_default = ",".join(
+        map(str, INF_default.get(r, [0,0,0,0]))
+    )
+
+    vecinos_default = ",".join(
+        Vecinos_default.get(r, [])
+    )
+
     poblaciones_txt = st.text_input(
         f"Poblaciones históricas de {r}",
-        value="50,60,75,90",
+        value=pob_default,
         key=f"pob_{r}"
     )
 
     infra_txt = st.text_input(
         f"Infraestructuras históricas de {r}",
-        value="0,0.5,1,1",
+        value=inf_default,
         key=f"inf_{r}"
     )
 
     infra_act = st.number_input(
         f"Infraestructura actual de {r}",
-        value=1.0,
+        value=float(
+            INF_ACT_default.get(r, 0)
+        ),
         key=f"inf_act_{r}"
     )
 
     vecinos_txt = st.text_input(
-        f"Vecinos de {r} (separados por comas)",
-        value="",
+        f"Vecinos de {r}",
+        value=vecinos_default,
         key=f"vec_{r}"
     )
 
@@ -79,13 +127,11 @@ for r in regiones:
 
     INF_ACT[r] = infra_act
 
-    vecinos_lista = [
+    Vecinos[r] = [
         x.strip()
         for x in vecinos_txt.split(",")
         if x.strip() != ""
     ]
-
-    Vecinos[r] = vecinos_lista
 
 # ---------------------------------
 # BOTÓN PRINCIPAL
@@ -175,11 +221,13 @@ if st.button("Ejecutar modelo"):
 
             for vecino in Vecinos[r]:
 
-                j = regiones.index(vecino)
+                if vecino in regiones:
 
-                difusion += (
-                    Pvec[j] - Pvec[i]
-                )
+                    j = regiones.index(vecino)
+
+                    difusion += (
+                        Pvec[j] - Pvec[i]
+                    )
 
             difusion *= beta
 
@@ -321,3 +369,4 @@ if st.button("Ejecutar modelo"):
     ax.legend()
 
     st.pyplot(fig)
+```
